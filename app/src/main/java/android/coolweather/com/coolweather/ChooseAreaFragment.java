@@ -19,7 +19,7 @@ import android.coolweather.com.coolweather.db.City;
 import android.coolweather.com.coolweather.db.County;
 import android.coolweather.com.coolweather.db.Province;
 import android.coolweather.com.coolweather.util.HttpUtil;
-
+import android.coolweather.com.coolweather.WeatherActivity;
 import com.orhanobut.logger.Logger;
 
 import org.litepal.crud.DataSupport;
@@ -105,6 +105,25 @@ public class ChooseAreaFragment extends Fragment{
                     selectedCity = cityList.get(position);
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
+                    String weatherId = countyList.get(position).getWeatherId();
+                    if (getActivity() instanceof MainActivity) {
+
+
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        //Intent intent = new Intent("android.coolweather.com.coolweather.WeatherActivity");
+
+                        intent.putExtra("weather_id", weatherId);
+                        Logger.d(intent);
+                        startActivity(intent);
+
+
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
 
                 }
             }
@@ -204,8 +223,6 @@ public class ChooseAreaFragment extends Fragment{
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
-                Logger.d("执行了onResponse");
-
                 boolean result = false;
                 if ("province".equals(type)) {
                     result = Utility.handleProvinceResponse(responseText);
@@ -233,13 +250,10 @@ public class ChooseAreaFragment extends Fragment{
 
             @Override
             public void onFailure(Call call, IOException e) {
-                Logger.d(e.getMessage());
                 // 通过runOnUiThread()方法回到主线程处理逻辑
                 getActivity().runOnUiThread(new Runnable() {
 
                     @Override public void run() {
-
-                        Logger.d("执行了onFailer");
                         closeProgressDialog();
                         Toast.makeText(getContext(), "加载失败", Toast.LENGTH_SHORT).show();
                     }

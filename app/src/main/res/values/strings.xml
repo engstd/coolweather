@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">CoolWeather</string>
+    <string name="yb">预报</string>
+    <string name="todo">TODO</string>
+    <string name="kqzl">空气质量</string>
+    <string name="aqi">AQI指数</string>
+    <string name="pm2_5">PM2.5指数</string>
+    <string name="shjy">生活建议</string>
 </resources>
